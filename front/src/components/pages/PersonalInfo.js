@@ -22,7 +22,7 @@ export default function PersonalInfo() {
         }
         getUser()
         console.log(userInfo)
-    })
+    }, [])
     if (!isLoaded) {
         return (
             <div className="container">
