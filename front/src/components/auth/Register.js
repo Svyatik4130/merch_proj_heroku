@@ -36,7 +36,7 @@ export default function Register() {
             dispatch(pushAddress(allLocations.data))
 
             localStorage.setItem("auth-token", loginRes.data.token)
-            history.push('/')
+            history.push('/main')
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg)
         }

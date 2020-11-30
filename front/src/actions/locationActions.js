@@ -10,3 +10,9 @@ export const addAddress = (addresses) => {
         payload: addresses
     }
 }
+export const deleteLocationRedux = (index) => {
+    return{
+        type: "DELETE_LOCATION",
+        payload: index
+    }
+}

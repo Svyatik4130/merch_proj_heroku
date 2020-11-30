@@ -8,8 +8,6 @@ router.post('/register', async (req, res) => {
     try {
         const { email, password, passwordCheck, displayName, phone, address } = req.body
 
-        console.log(displayName)
-
         if (!email || !password || !passwordCheck) {
             return res.status(400).json({ msg: 'Not all fields have been entered' })
         }
@@ -20,22 +18,29 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ msg: "enter the same password" });
         }
 
-        const existingUser = await User.findOne({ email: email })
-        if (existingUser) {
+        const existingUserWithSuchEmail = await User.findOne({ email: email })
+        if (existingUserWithSuchEmail) {
             return res.status(400).json({ msg: "an account with this email is already exists" })
         }
+
         let newName = ""
         if (!displayName) { newName = email } else {newName = displayName}
+
+        const existingUserWithSuchName = await User.findOne({ displayName: email })
+        if (existingUserWithSuchName) {
+            return res.status(400).json({ msg: "an account with such name is already exists" })
+        }
+        
         const salt = await bcrypt.genSalt()
         const passwordHash = await bcrypt.hash(password, salt)
-        console.length
         const newUser = new User({
             email,
             password: passwordHash,
             displayName: newName,
             phone,
             address,
-            roleId: 0
+            roleId: 0,
+            pending: true
         })
         const savedUser = await newUser.save()
         res.json(savedUser)
@@ -77,19 +82,10 @@ router.post("/login", async (req, res) => {
     }
 })
 
-router.delete("/delete", auth, async (req, res) => {
-    try {
-        const deleteUser = await User.findByIdAndDelete(req.user)
-        res.json(deleteUser)
-    } catch (err) {
-        res.status(500).json(err.message)
-    }
-})
 router.post("/deleteUser", auth, async (req, res) => {
     try {
         const isAdmin = await User.findById(req.user)
         if (isAdmin.roleId !== 1) {
-            console.log('hello')
             return res.status(400).json({ msg: "Only admin can delete user" })
         }
         const deletedUser = await User.findByIdAndDelete(req.body.userID)
@@ -127,6 +123,18 @@ router.get("/", auth, async (req, res) => {
         phone: user.phone,
         address: user.address
     })
+})
+router.post("/acceptuser", auth, async (req, res) => {
+    const isAdmin = await User.findById(req.user)
+    if (isAdmin.roleId !== 1) {
+        return res.status(400).json({ msg: "Only admin can delete user" })
+    }
+
+    const user = await User.findById(req.body.userId);
+    user.pending = false
+
+    const replacedUser = await User.replaceOne({_id: req.body.userId}, user)
+    res.json(replacedUser)
 })
 
 router.get("/getallusers", async (req, res) => {

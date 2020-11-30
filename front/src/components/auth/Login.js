@@ -37,7 +37,7 @@ export default function Login() {
                 dispatch(getAllUsers(allUsers.data))
             }
 
-            history.push('/')
+            history.push('/main')
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg)
         }

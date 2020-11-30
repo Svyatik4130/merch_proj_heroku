@@ -7,11 +7,12 @@ import { loggedUser } from "./actions/UserActions";
 import { useDispatch } from "react-redux";
 import { pushAddress } from "./actions/locationActions";
 import { getAllUsers } from "./actions/UserActions";
+import { sendAllReportsAdmin } from './actions/sendAllreports-Admin'
 
-import Report from "./components/pages/AddReport";
+
 import SeeReportsForAdmin from "./components/pages/SeeReportsForAdmin";
 import Header from "./components/layout/Header";
-import Home from "./components/pages/Home";
+import HomeRoute from "./components/pages/HomeRoute";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import Profile from "./components/pages/PersonalInfo";
@@ -44,6 +45,10 @@ function App() {
         if (userRespond.data.role === 1) {
           const allUsers = await axios.get("/users/getallusers");
           dispatch(getAllUsers(allUsers.data));
+
+          let token = localStorage.getItem("auth-token")
+          const allReports = await axios.get("/report/getallreports", { headers: { "x-auth-token": token } })
+          dispatch(sendAllReportsAdmin(allReports.data))
         }
 
         const allLocations = await axios.get("/locations/alllocations");
@@ -69,13 +74,10 @@ function App() {
         <Header />
         <div className="container">
           <Switch>
-            <Route exact path="/" component={Home} />
+            <Route path="/main" component={HomeRoute} />
             <Route path="/login" component={Login} />
             <Route path="/register" component={Register} />
             <Route path="/profile" component={Profile} />
-            <Route path="/makereport">
-              <Report />
-            </Route>
             <Route path="/seereports-admin">
               <SeeReportsForAdmin />
             </Route>

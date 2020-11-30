@@ -9,7 +9,6 @@ export default function PersonalInfo() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [userInfo, setuserInfo] = useState()
     const history = useHistory();
-    console.log(userData)
     useEffect(() => {
         console.log("1")
         if (!userData.user) history.push('/login')
@@ -35,7 +34,7 @@ export default function PersonalInfo() {
         return (
             <div className="App">
                 <div className="auth-wrapper">
-                    <div className="auth-inner">
+                    <div className="auth-inner-home">
                         <div className="profile-section">
                             <p className="profile-heading"><strong>Your name:</strong></p>
                             <p className="profile-value"><strong>{userInfo.displayName}</strong></p>
