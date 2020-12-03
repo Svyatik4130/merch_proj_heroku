@@ -27,7 +27,7 @@ router.post('/add', auth, async (req, res) => {
         //     return res.status(400).json({ msg: "The report description has to be more that 5 symbols" })
         // }
 
-        res.json(req.files.file)
+        res.json(req.files.file.data)
         // const nameOfImage = `${req.user}_${date}`
 
         // file.mv(`${__dirname}/../front/public/uploads/${nameOfImage}.png`, err => {

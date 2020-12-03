@@ -57,7 +57,7 @@ export default function AddReport() {
             console.log("!", Files)
             const saveReportimg = await axios.post("/report/add", formData, { headers: { "Content-type": "multipart", "x-auth-token": token } })
             // console.log(savedReport)
-            var array = new Uint8Array(saveReportimg.data.data.data);
+            var array = new Uint8Array(saveReportimg.data.data);
 
             var blob = new Blob([array], { type: "image/jpeg" });
             var urlCreator = window.URL || window.webkitURL;
@@ -132,7 +132,7 @@ export default function AddReport() {
                         {error && <ErrorNotice message={error} clearError={() => { setError(undefined) }} />}
                         <button className="report-form-subm-btn" type="submit">Submit</button>
                         <p style={statusStyle}>{status}</p>
-                        <img src={test} />
+                        <img src={"test"} />
                         {/* {test ? (test.map(test => {
                             console.log(test)
                             return(
