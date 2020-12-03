@@ -7,7 +7,7 @@ const locationReportsSchema = new mongoose.Schema({
     reporterID: {type: String, required: true},
     reporterName: {type: String, required: true},
     date: {type: String, required: true},
-    imageName: {type: String, required: true}
+    images: {type: Array, required: true}
 })
 
 module.exports = locationReport = mongoose.model("locationReport", locationReportsSchema)

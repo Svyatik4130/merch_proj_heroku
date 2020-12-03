@@ -59,7 +59,14 @@ router.post("/getExactResponsibility", async (req, res) => {
 
     const exactResponsibility = Responsibilities.find(Responsibility => Responsibility.userId == req.body.userID)
 
-    res.json(exactResponsibility)
+    if (!exactResponsibility) {
+        const newarr = {usersLocations: []}
+        res.json(newarr)
+    } else {
+        res.json(exactResponsibility)
+
+    }
+
 })
 
 router.post("/setLocationForUser", auth, async (req, res) => {

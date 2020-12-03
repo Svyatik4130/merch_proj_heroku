@@ -22,14 +22,12 @@ export default function SeeReportsForAdmin() {
     }
   })
 
-  console.log("1", NeddedLoaction)
   // const ActiveLocation = useSelector((state) => state.ActiveLocation);
   const allUsers = useSelector((state) => state.allUsers)
   let allNonAdmins = allUsers.filter(user => user.roleId === 0)
   const history = useHistory();
   const dispatch = useDispatch()
   const allreports = useSelector((state) => state.allreports)
-  console.log("2", allreports)
   const onlyNeededReports = allreports.filter(
     (report) => report.locationTitle === NeddedLoaction.address
   )
@@ -127,6 +125,8 @@ export default function SeeReportsForAdmin() {
       <div className='App'>
         <div className='auth-wrapper'>
           <div className="auth-inner-reports">
+            {allreports[0].images[0]}
+            <img src={'blob:http://localhost:3000/cff72aff-a97f-4eab-bfbf-87d2815e3711'} />
             {reports.htmlreports.length <= 0 ? (
               reports.noUsersReports ? (
                 <div>

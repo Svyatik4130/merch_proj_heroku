@@ -1,18 +1,23 @@
 import Axios from 'axios';
 import React, { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import PulseLoader from "react-spinners/PulseLoader";
 import axios from 'axios'
+import { deleteUserRedux } from '../../actions/UserActions'
+import { deletePendingUserRedux } from '../../actions/UserActions'
+import { getAllUsers } from "../../actions/UserActions";
 
 
 export default function PendingUsers() {
+    const dispatch = useDispatch()
     const allUsers = useSelector(state => state.allUsers)
+    const pendingUsers = useSelector(state => state.pendingUsers)
     const [isLoaded, setIsLoaded] = useState(false);
     const [htmlAllPendingUsers, sethtmlAllPendingUsers] = useState()
 
     useEffect(() => {
         sethtmlAllPendingUsers({
-            html: allUsers.filter(user => user.pending === true)
+            html: pendingUsers
         })
 
         setIsLoaded(true);
@@ -23,17 +28,25 @@ export default function PendingUsers() {
         let token = localStorage.getItem("auth-token")
         const replaceUser = await axios.post("/users/acceptuser", { userId }, { headers: { "x-auth-token": token } })
         console.log(replaceUser)
-        UsersRerender(userId)
+        const index = htmlAllPendingUsers.html.findIndex((user) => { return user._id === userId })
+
+        allUsers.push(pendingUsers.find(pndUser => pndUser._id === userId))
+        dispatch(getAllUsers(allUsers))
+        dispatch(deletePendingUserRedux(index))
+        UsersRerender(index)
     }
     const rejectRegistration = async (userID) => {
         let token = localStorage.getItem("auth-token")
         const replaceUser = await axios.post("/users/deleteUser", { userID }, { headers: { "x-auth-token": token } })
         console.log(replaceUser)
-        UsersRerender(userID)
+        const index = htmlAllPendingUsers.html.findIndex((user) => { return user._id === userID })
+
+        dispatch(deleteUserRedux(index))
+        dispatch(deletePendingUserRedux(index))
+        UsersRerender(index)
     }
 
-    const UsersRerender = (userId) => {
-        const index = htmlAllPendingUsers.html.findIndex((user) => { return user._id === userId })
+    const UsersRerender = (index) => {
         if (index > -1) {
             const newArr = htmlAllPendingUsers
             newArr.html.splice(index, 1)

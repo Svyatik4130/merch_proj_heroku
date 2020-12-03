@@ -4,6 +4,7 @@ import Locations from './locationsOpp'
 import getAllUsers from './GetUsers'
 import ActiveLocation from './ActiveLocation'
 import AllReports from './AllReports'
+import pendingUsrs from './pendingUsrs'
 
 
 const allReducers = combineReducers({
@@ -11,7 +12,8 @@ const allReducers = combineReducers({
     allUsers: getAllUsers,
     allAddresses: Locations,
     ActiveLocation: ActiveLocation,
-    allreports: AllReports
+    allreports: AllReports,
+    pendingUsers: pendingUsrs
 })
 
 export default allReducers

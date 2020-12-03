@@ -5,6 +5,7 @@ import axios from 'axios'
 import ErrorNotice from '../misc/ErrorNotice'
 import { loggedUser } from '../../actions/UserActions'
 import { getAllUsers } from '../../actions/UserActions'
+import { getAllPendingUsers } from '../../actions/UserActions'
 import { useDispatch } from 'react-redux'
 import { pushAddress } from '../../actions/locationActions'
 
@@ -29,12 +30,17 @@ export default function Login() {
             }))
             localStorage.setItem("auth-token", loginRes.data.token)
 
-            const allLocations = await axios.get("/locations/alllocations")
-            dispatch(pushAddress(allLocations.data))
+            if (!loginRes.data.user.pending) {
+                const allLocations = await axios.get("/locations/alllocations")
+                dispatch(pushAddress(allLocations.data))
+            }
 
             if (loginRes.data.user.role === 1) {
-                const allUsers = await axios.get("/users/getallusers")
-                dispatch(getAllUsers(allUsers.data))
+                const allUsers = await axios.get("/users/getallusers");
+                dispatch(getAllUsers(allUsers.data.filter(user => !user.pending)));
+
+                const pendingUsers = allUsers.data.filter(user => user.pending)
+                dispatch(getAllPendingUsers(pendingUsers))
             }
 
             history.push('/main')

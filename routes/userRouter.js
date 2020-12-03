@@ -53,7 +53,6 @@ router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body
 
-
         if (!email || !password) {
             return res.status(400).json({ msg: "not all fields have been entered" })
         }
@@ -73,7 +72,8 @@ router.post("/login", async (req, res) => {
             user: {
                 id: userAcc._id,
                 displayName: userAcc.displayName,
-                role: userAcc.roleId
+                role: userAcc.roleId,
+                pending: userAcc.pending
             }
         })
 
@@ -121,7 +121,8 @@ router.get("/", auth, async (req, res) => {
         role: user.roleId,
         email: user.email,
         phone: user.phone,
-        address: user.address
+        address: user.address,
+        pending: user.pending
     })
 })
 router.post("/acceptuser", auth, async (req, res) => {

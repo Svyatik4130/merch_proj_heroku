@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { loggedUser } from '../../actions/UserActions'
 import { pushAddress } from '../../actions/locationActions'
 import { getAllUsers } from '../../actions/UserActions'
+import { sendAllReportsAdmin } from '../../actions/sendAllreports-Admin'
+
 
 
 export default function Header() {
@@ -24,6 +26,7 @@ export default function Header() {
         }))
         dispatch(pushAddress([]))
         dispatch(getAllUsers([]))
+        dispatch(sendAllReportsAdmin([]))
         localStorage.setItem("auth-token", "")
     }
 

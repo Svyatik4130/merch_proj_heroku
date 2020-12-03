@@ -7,6 +7,7 @@ import { loggedUser } from "./actions/UserActions";
 import { useDispatch } from "react-redux";
 import { pushAddress } from "./actions/locationActions";
 import { getAllUsers } from "./actions/UserActions";
+import { getAllPendingUsers } from "./actions/UserActions";
 import { sendAllReportsAdmin } from './actions/sendAllreports-Admin'
 
 
@@ -44,15 +45,20 @@ function App() {
 
         if (userRespond.data.role === 1) {
           const allUsers = await axios.get("/users/getallusers");
-          dispatch(getAllUsers(allUsers.data));
+          dispatch(getAllUsers(allUsers.data.filter(user => !user.pending)));
 
           let token = localStorage.getItem("auth-token")
           const allReports = await axios.get("/report/getallreports", { headers: { "x-auth-token": token } })
           dispatch(sendAllReportsAdmin(allReports.data))
+
+          const pendingUsers = allUsers.data.filter(user => user.pending)
+          dispatch(getAllPendingUsers(pendingUsers))
         }
 
-        const allLocations = await axios.get("/locations/alllocations");
-        dispatch(pushAddress(allLocations.data));
+        if (!userRespond.data.pending) {
+          const allLocations = await axios.get("/locations/alllocations");
+          dispatch(pushAddress(allLocations.data));
+        }
       }
 
       setIsLoaded(true);
@@ -76,6 +82,7 @@ function App() {
           <Switch>
             <Route path="/main" component={HomeRoute} />
             <Route path="/login" component={Login} />
+            <Route exact path="/" component={Login} />
             <Route path="/register" component={Register} />
             <Route path="/profile" component={Profile} />
             <Route path="/seereports-admin">

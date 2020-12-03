@@ -8,6 +8,7 @@ import { addAddress } from '../../actions/locationActions'
 
 import AddReport from './AddReport'
 import ExactLocationsForUser from '../layout/ExactLocationsForUser'
+import IsPending from '../layout/IsPending'
 
 export default function HomeAdmin() {
     const url = window.location.href
@@ -27,9 +28,10 @@ export default function HomeAdmin() {
             let token = localStorage.getItem("auth-token")
             const { data } = await axios.get("/users/", { headers: { "x-auth-token": token } })
             console.log(data)
+            if(data.pending) history.push("/main/user/pending")
             setuserInfo(data)
             setIsLoaded(true)
-
+            
             if(url.slice(-4) == "main"){
                 history.push("/main/user/locations")
             }
@@ -48,32 +50,6 @@ export default function HomeAdmin() {
         // }
         getUser()
     }, [])
-
-    const setNewActive = (active_menu) => {
-        switch (active_menu) {
-            case "locations":
-                setclassNameForMenuBtn({
-                    location: "menu-active",
-                    users: ""
-                })
-                break;
-            case "users":
-                setclassNameForMenuBtn({
-                    location: "",
-                    users: "menu-active"
-                })
-                break;
-
-            default:
-                history.push("/main")
-                setclassNameForMenuBtn({
-                    location: "",
-                    users: "menu-active"
-                })
-                break;
-        }
-    }
-
 
     if (!isLoaded) {
         return (
@@ -133,6 +109,7 @@ export default function HomeAdmin() {
                                 <Switch>
                                     <Route exact path="/main/user/locations" component={ExactLocationsForUser} />
                                     <Route exact path="/main/user/makereport/:id" children={<AddReport />} />
+                                    <Route exact path="/main/user/pending" children={<IsPending />} />
                                 </Switch>
                             </div>
                         </div>
