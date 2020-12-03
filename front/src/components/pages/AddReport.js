@@ -132,7 +132,7 @@ export default function AddReport() {
                         {error && <ErrorNotice message={error} clearError={() => { setError(undefined) }} />}
                         <button className="report-form-subm-btn" type="submit">Submit</button>
                         <p style={statusStyle}>{status}</p>
-                        <img src={"test"} />
+                        <img src={test} />
                         {/* {test ? (test.map(test => {
                             console.log(test)
                             return(
