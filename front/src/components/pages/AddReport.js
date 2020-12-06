@@ -5,6 +5,7 @@ import axios from 'axios'
 import { useSelector, useDispatch } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { Link } from "react-router-dom"
+import { Modal, Button, Form } from 'react-bootstrap'
 import ErrorNotice from '../misc/ErrorNotice'
 
 import { sendAllReportsAdmin } from '../../actions/sendAllreports-Admin'
@@ -25,6 +26,14 @@ export default function AddReport() {
     const [Report, setReport] = useState({
         value: ""
     })
+
+
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+
     const [e, sete] = useState()
     const [imagesNames, setimagesNames] = useState([])
     const [htmlImages, sethtmlImages] = useState([])
@@ -53,10 +62,8 @@ export default function AddReport() {
                 setimagesNames(imagesNames.push(cloud.data.secure_url));
                 if (index === filesArr.length - 1) {
                     setTimeout(() => {
-                        console.log(index, filesArr.length)
                         setfinal(imagesNames)
                         setareFilesLoaded(true)
-                        console.log(imagesNames)
                     }, 500);
                 }
                 // console.log(imagesNames)
@@ -67,6 +74,8 @@ export default function AddReport() {
             // error.response.data.msg && setError(error.response.data.msg)
         }
     }
+
+
 
     useEffect(() => {
         const addReport = async () => {
@@ -83,7 +92,8 @@ export default function AddReport() {
                 }, { headers: { "x-auth-token": token } })
                 console.log(saveReportimg)
 
-                dispatch(sendAllReportsAdmin(allreports.push(saveReportimg.data)))
+                allreports.push(saveReportimg.data)
+                dispatch(sendAllReportsAdmin(allreports))
 
                 e.target.children[0].children[1].value = ''
                 setReport({ value: "" })
@@ -99,12 +109,12 @@ export default function AddReport() {
                         setStatus("")
                     }, 5000);
                 }
+                handleShow()
+
                 sethtmlImages([])
-
-
             } catch (error) {
                 console.log(error.message)
-                error.response.data.msg && setError(error.response.data.msg)
+                // error.response.data.msg && setError(error.response.data.msg)
             }
         }
         if (areFilesLoaded) {
@@ -131,6 +141,8 @@ export default function AddReport() {
             )
         })
     }
+
+
     if (!isLoaded) {
         return (
             <div className="container">
@@ -142,6 +154,19 @@ export default function AddReport() {
     } else {
         return (
             <>
+                <Modal show={show} onHide={() => { history.push("/main/user/locations"); handleClose() }} centered>
+                    <div className="modal-set-locations">
+                        <Modal.Header closeButton>
+                            <Modal.Title>Successful operation</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>You have successfully added report for location: {ActiveLocation.address}</Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="primary" onClick={() => { history.push("/main/user/locations"); handleClose() }}>
+                                Go to the Locations page
+                            </Button>
+                        </Modal.Footer>
+                    </div>
+                </Modal>
                 <Link to={"/main/user/locations"}><h5>ᐸ Back</h5></Link>
                 <p>Make report for location: <strong>{ActiveLocation.address}</strong></p>
                 <form onSubmit={(e) => submit(e)}>

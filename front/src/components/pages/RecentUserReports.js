@@ -17,6 +17,8 @@ export default function RecentUserReports() {
 
     useEffect(() => {
         setIsLoaded(true);
+        
+        
     }, [])
 
     function hideOrDisplayImage(e) {
