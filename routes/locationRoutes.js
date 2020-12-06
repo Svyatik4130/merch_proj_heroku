@@ -72,8 +72,6 @@ router.post("/getExactResponsibility", async (req, res) => {
 router.post("/setLocationForUser", auth, async (req, res) => {
     const isExists = await usersResponsibility.findOne({ userId: req.body[0]._id })
 
-    console.log(isExists)
-
     if (isExists === null) {
         const newResponsibility = new usersResponsibility({
             userId: req.body[0]._id,
@@ -96,7 +94,6 @@ router.post("/deleteLocation", auth, async (req, res) => {
         if (isAdmin.roleId !== 1) {
             return res.status(400).json({ msg: "Only admin can delete user" })
         }
-        console.log(req.body.locId)
         const deletedLocation = await Location.findByIdAndDelete(req.body.locId)
 
 

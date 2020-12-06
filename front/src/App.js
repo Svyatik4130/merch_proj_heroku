@@ -51,13 +51,19 @@ function App() {
           const allReports = await axios.get("/report/getallreports", { headers: { "x-auth-token": token } })
           dispatch(sendAllReportsAdmin(allReports.data))
 
-          const pendingUsers = allUsers.data.filter(user => user.pending)
+          const pendingUsers = await allUsers.data.filter(user => user.pending)
           dispatch(getAllPendingUsers(pendingUsers))
         }
 
         if (!userRespond.data.pending) {
           const allLocations = await axios.get("/locations/alllocations");
           dispatch(pushAddress(allLocations.data));
+
+          if (userRespond.data.role !== 1) {
+            let token = localStorage.getItem("auth-token")
+            const allReports = await axios.get("/report/getuserreports", { headers: { "x-auth-token": token } })
+            dispatch(sendAllReportsAdmin(allReports.data))
+          }
         }
       }
 

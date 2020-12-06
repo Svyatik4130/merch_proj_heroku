@@ -14,6 +14,12 @@ export default function PendingUsers() {
     const pendingUsers = useSelector(state => state.pendingUsers)
     const [isLoaded, setIsLoaded] = useState(false);
     const [htmlAllPendingUsers, sethtmlAllPendingUsers] = useState()
+    
+    useEffect(() => {
+        sethtmlAllPendingUsers({
+            html: pendingUsers
+        })
+    }, [htmlAllPendingUsers])
 
     useEffect(() => {
         sethtmlAllPendingUsers({
@@ -22,6 +28,7 @@ export default function PendingUsers() {
 
         setIsLoaded(true);
     }, [])
+    
 
 
     const acceptRegistration = async (userId) => {
@@ -33,7 +40,6 @@ export default function PendingUsers() {
         allUsers.push(pendingUsers.find(pndUser => pndUser._id === userId))
         dispatch(getAllUsers(allUsers))
         dispatch(deletePendingUserRedux(index))
-        UsersRerender(index)
     }
     const rejectRegistration = async (userID) => {
         let token = localStorage.getItem("auth-token")
@@ -41,20 +47,9 @@ export default function PendingUsers() {
         console.log(replaceUser)
         const index = htmlAllPendingUsers.html.findIndex((user) => { return user._id === userID })
 
-        dispatch(deleteUserRedux(index))
         dispatch(deletePendingUserRedux(index))
-        UsersRerender(index)
     }
 
-    const UsersRerender = (index) => {
-        if (index > -1) {
-            const newArr = htmlAllPendingUsers
-            newArr.html.splice(index, 1)
-            sethtmlAllPendingUsers({
-                html: newArr.html
-            })
-        }
-    }
 
     if (!isLoaded) {
         return (

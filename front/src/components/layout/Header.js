@@ -6,6 +6,7 @@ import { loggedUser } from '../../actions/UserActions'
 import { pushAddress } from '../../actions/locationActions'
 import { getAllUsers } from '../../actions/UserActions'
 import { sendAllReportsAdmin } from '../../actions/sendAllreports-Admin'
+import { getAllPendingUsers } from '../../actions/UserActions'
 
 
 
@@ -27,6 +28,7 @@ export default function Header() {
         dispatch(pushAddress([]))
         dispatch(getAllUsers([]))
         dispatch(sendAllReportsAdmin([]))
+        dispatch(getAllPendingUsers([]))
         localStorage.setItem("auth-token", "")
     }
 
@@ -59,7 +61,6 @@ export default function Header() {
                 </div>
                 {userData.user ? (
                     <ul className="nav navbar-nav navbar-left">
-                        <li className="nav-item"><button onClick={myAcc}>Profile</button></li>
                     </ul>
                 ) : (null)}
             </div>

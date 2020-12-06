@@ -6,6 +6,7 @@ import ErrorNotice from '../misc/ErrorNotice'
 import { loggedUser } from '../../actions/UserActions'
 import { getAllUsers } from '../../actions/UserActions'
 import { getAllPendingUsers } from '../../actions/UserActions'
+import { sendAllReportsAdmin } from '../../actions/sendAllreports-Admin'
 import { useDispatch } from 'react-redux'
 import { pushAddress } from '../../actions/locationActions'
 
@@ -39,8 +40,16 @@ export default function Login() {
                 const allUsers = await axios.get("/users/getallusers");
                 dispatch(getAllUsers(allUsers.data.filter(user => !user.pending)));
 
-                const pendingUsers = allUsers.data.filter(user => user.pending)
+                let token = localStorage.getItem("auth-token")
+                const allReports = await axios.get("/report/getallreports", { headers: { "x-auth-token": token } })
+                dispatch(sendAllReportsAdmin(allReports.data))
+
+                const pendingUsers = await allUsers.data.filter(user => user.pending)
                 dispatch(getAllPendingUsers(pendingUsers))
+            } else {
+                let token = localStorage.getItem("auth-token")
+                const allReports = await axios.get("/report/getuserreports", { headers: { "x-auth-token": token } })
+                dispatch(sendAllReportsAdmin(allReports.data))
             }
 
             history.push('/main')

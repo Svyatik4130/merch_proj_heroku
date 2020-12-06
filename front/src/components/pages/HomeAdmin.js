@@ -51,7 +51,6 @@ export default function HomeAdmin() {
             }
         }
 
-        const check = url.split("main")
         if (url.match("/main/admin/locations")) {
             setclassNameForMenuBtn({
                 location: "menu-active",
@@ -169,7 +168,7 @@ export default function HomeAdmin() {
                                             </div>
                                         </form>
                                         <div className="all-loacations-admin">
-                                            {addAddressAnim_inputValue.status}
+                                            <p className={addAddressAnim_inputValue.statusClassname} >{addAddressAnim_inputValue.status}</p>
                                         </div>
                                     </>) : (null)}
 

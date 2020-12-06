@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 // import { sendAllReportsAdmin } from "../../actions/sendAllreports-Admin";
 // import axios from "axios";
+import 'react-image-lightbox/style.css';
+import Lightbox from 'react-image-lightbox';
 import { useHistory } from "react-router-dom";
+import ModalImage from "react-modal-image";
 import PulseLoader from "react-spinners/PulseLoader";
 import { useParams } from 'react-router-dom'
 import { Link } from "react-router-dom"
@@ -11,6 +14,11 @@ import { setActiveLoc } from "../../actions/defineActiveLocation";
 export default function SeeReportsForAdmin() {
   const [isLoaded, setIsLoaded] = useState(false)
   const { id } = useParams()
+  const [modalImage, setmodalImage] = useState({
+    isOpen: false,
+    source: ""
+  })
+  const [images, setimages] = useState()
   const [urlID, seturlID] = useState(id)
   const allAddresses = useSelector(state => state.allAddresses)
 
@@ -27,7 +35,12 @@ export default function SeeReportsForAdmin() {
   let allNonAdmins = allUsers.filter(user => user.roleId === 0)
   const history = useHistory();
   const dispatch = useDispatch()
-  const allreports = useSelector((state) => state.allreports)
+  // sorting
+  const allreports = useSelector((state) => state.allreports).sort((a, b) => {
+    const one = Number(b.date.split(".").join("").split(":").join(''))
+    const two = Number(a.date.split(".").join("").split(":").join(''))
+    return one - two
+  })
   const onlyNeededReports = allreports.filter(
     (report) => report.locationTitle === NeddedLoaction.address
   )
@@ -38,18 +51,30 @@ export default function SeeReportsForAdmin() {
     isUserSearched: false
   })
 
+  const ModalImage = (url) => {
+    setmodalImage({
+      isOpen: true,
+      source: url
+    })
+  }
 
   useEffect(() => {
     if (input.length <= 0) {
+
       setReports({
         htmlreports: onlyNeededReports.map((report) => {
+          const images = report.images.map(source => {
+            return (<img style={{"cursor": "pointer"}} onClick={() => { ModalImage(source) }} src={source} alt={source} />)
+          })
           return (
             <div className='admin-report-container' key={report.id}>
               <p>{report.reportTitle}</p>
               <p>Reporter: <strong>{report.reporterName}</strong></p>
               <p> Report date: <strong>{report.date}</strong> </p>
               <button name='false' className='admin-report-container-btn' onClick={(e) => hideOrDisplayImage(e)}> Show images</button>
-              <img className='admin-report-container-img-hidden' src={`/uploads/${report.imageName}.png`} />
+              <div className="admin-report__images-hidden">
+                {images}
+              </div>
             </div>
           )
         }),
@@ -63,11 +88,11 @@ export default function SeeReportsForAdmin() {
     const btn = e.target;
     const img = e.target.closest("div").children[4];
     if (btn.name === "false") {
-      img.className = "admin-report-container-img-visible";
+      img.className = "admin-report__images";
       btn.name = "true";
       btn.innerText = "Hide images";
     } else if (btn.name === "true") {
-      img.className = "admin-report-container-img-hidden";
+      img.className = "admin-report__images-hidden";
       btn.name = "false";
       btn.innerText = "Show images";
     }
@@ -91,13 +116,18 @@ export default function SeeReportsForAdmin() {
     if (searchedReports.length > 0) {
       setReports({
         htmlreports: searchedReports.map((report) => {
+          const images = report.images.map(source => {
+            return (<img onClick={() => { ModalImage(source) }} src={source} alt={source} />)
+          })
           return (
             <div className='admin-report-container' key={report.id}>
               <p>{report.reportTitle}</p>
               <p>Reporter: <strong>{report.reporterName}</strong></p>
               <p> Report date: <strong>{report.date}</strong> </p>
               <button name='false' className='admin-report-container-btn' onClick={(e) => hideOrDisplayImage(e)}> Show images</button>
-              <img className='admin-report-container-img-hidden' src={`/uploads/${report.imageName}.png`} />
+              <div className="admin-report__images-hidden">
+                {images}
+              </div>
             </div>
           )
         }),
@@ -110,7 +140,6 @@ export default function SeeReportsForAdmin() {
       setInput(name)
     }
   }
-
 
   if (!isLoaded) {
     return (
@@ -125,8 +154,13 @@ export default function SeeReportsForAdmin() {
       <div className='App'>
         <div className='auth-wrapper'>
           <div className="auth-inner-reports">
-            {allreports[0].images[0]}
-            <img src={'blob:http://localhost:3000/cff72aff-a97f-4eab-bfbf-87d2815e3711'} />
+            {modalImage.isOpen && (
+              <Lightbox
+                mainSrc={modalImage.source}
+                onCloseRequest={() => setmodalImage({ isOpen: false, source: "" })}
+              />)}
+
+
             {reports.htmlreports.length <= 0 ? (
               reports.noUsersReports ? (
                 <div>
@@ -173,6 +207,7 @@ export default function SeeReportsForAdmin() {
                         </div>
                       </div>
                       {reports.htmlreports}
+                      <img src={images} />
                     </div>
                   )
               )

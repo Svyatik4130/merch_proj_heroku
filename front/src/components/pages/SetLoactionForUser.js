@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { Form } from "react-bootstrap";
 import { useSelector, useDispatch } from 'react-redux'
+import { useHistory } from "react-router-dom";
 import PulseLoader from "react-spinners/PulseLoader";
 import axios from 'axios'
+import { Modal, Button, Form } from 'react-bootstrap'
 
 import ErrorNotice from '../misc/ErrorNotice'
 
 export default function SetLoactionForUser() {
     const { id } = useParams()
-    let allAddresses = useSelector(state => state.allAddresses)
+    const history = useHistory();
+    const allAddresses1 = useSelector(state => state.allAddresses)
+    console.log('1')
+    let allAddresses = allAddresses1
+    const [arrForSending, setarrForSending] = useState([])
+
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
 
     const [error, setError] = useState()
     const [isLoaded, setIsLoaded] = useState(false)
@@ -20,19 +31,18 @@ export default function SetLoactionForUser() {
 
 
     useEffect(() => {
-        allAddresses.map(location => { location.isChecked = false })
         const setTicks = async () => {
+            allAddresses.map(location => { location.isChecked = false })
 
             const { data } = await axios.get("/locations/getResponsibilities")
-            console.log(data)
             if (data) {
                 const foundArr = data.find((responsibility) => responsibility.userId === thisUser._id)
                 if (foundArr) {
                     foundArr.usersLocations.forEach((address) => {
                         const foundAddressIntoAddress = allAddresses.find((location) => { return location._id === address._id })
                         if (foundAddressIntoAddress) {
-                            console.log(allAddresses)
                             allAddresses.map(location => {
+                                console.log("settick")
                                 if (location._id === foundAddressIntoAddress._id) {
                                     location.isChecked = true
                                 }
@@ -51,6 +61,8 @@ export default function SetLoactionForUser() {
             }))
         }
         setTicks()
+        console.log(allAddresses)
+        setarrForSending(allAddresses)
 
         setIsLoaded(true)
     }, [])
@@ -71,17 +83,18 @@ export default function SetLoactionForUser() {
     }
 
     const submit = async () => {
-        const tickedAddresses = allAddresses.filter(address => address.isChecked === true)
+        const tickedAddresses = arrForSending.filter(address => address.isChecked === true)
         try {
             let token = localStorage.getItem("auth-token")
             const sentObligations = await axios.post('/locations/setLocationForUser', [thisUser, tickedAddresses], { headers: { "x-auth-token": token } })
             console.log(sentObligations)
+            handleShow()
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg)
         }
     }
 
-    if (!isLoaded || HtmlAddresses === null) {
+    if (!isLoaded || HtmlAddresses === null && allAddresses[0].isChecked === undefined) {
         return (
             <div className="container">
                 <div className="preloader">
@@ -92,6 +105,19 @@ export default function SetLoactionForUser() {
     } else {
         return (
             <div className='App'>
+                <Modal show={show} onHide={() => { history.push("/main/admin/users"); handleClose()}} centered>
+                    <div className="modal-set-locations">
+                        <Modal.Header closeButton>
+                            <Modal.Title>Successful operation</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>You have changed locations for user: {thisUser.displayName}</Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="primary" onClick={() => { history.push("/main/admin/users"); handleClose() }}>
+                                Go to the Users page
+                            </Button>
+                        </Modal.Footer>
+                    </div>
+                </Modal>
                 <div className='auth-wrapper'>
                     <div className="auth-inner-reports">
                         <div className="setLocationForUser-title">
@@ -102,7 +128,7 @@ export default function SetLoactionForUser() {
                         <div className="setLocationForUser-checkboxes">
                             {HtmlAddresses}
                         </div>
-                        <button onClick={() => submit()} >Submit</button>
+                        <button className="addres-action-button" onClick={() => submit()} >Submit</button>
                     </div>
                 </div>
             </div>

@@ -7,15 +7,18 @@ import { sendAllReportsAdmin } from '../../actions/sendAllreports-Admin'
 import { useHistory } from 'react-router-dom'
 import axios from 'axios'
 
+import EmptyPage from '../misc/EmptyPage'
+
 export default function AdminPanel() {
     const dispatch = useDispatch()
     const history = useHistory();
     // dispatch(addAddress({_id: "5fa1d35b686bf918b4c9d7ds", id:5, address: "testtesttest" }))
 
     const allUsers = useSelector(state => state.allUsers)
+    const userData = useSelector(state => state.userData)
 
     const [htmlAllUsers, sethtmlAllUsers] = useState({
-        html: allUsers
+        html: allUsers.filter(user => user._id !== userData.user.id)
     })
 
     useEffect(() => {
@@ -51,21 +54,26 @@ export default function AdminPanel() {
 
     return (
         <div>
-            <h2>All users</h2>
-            {htmlAllUsers.html.length > 0 ? (htmlAllUsers.html.map((user) => {
-                return (
-                    <div key={user._id} className="admin-panel-user-container">
-                        <div className="inner-admin-panel-user-container-container">
-                            <div className="admin-panel-user-container-container">
-                                <p className="admin-panel-userName">{user.displayName}</p>
-                                <p className="admin-panel-email">{user.email}</p>
+            {htmlAllUsers.html.length > 0 ? (
+                <>
+                <h2>All users</h2>
+
+                {htmlAllUsers.html.map((user) => {
+                    return (
+                        <div key={user._id} className="admin-panel-user-container">
+                            <div className="inner-admin-panel-user-container-container">
+                                <div className="admin-panel-user-container-container">
+                                    <p className="admin-panel-userName">{user.displayName}</p>
+                                    <p className="admin-panel-email">{user.email}</p>
+                                </div>
+                                {user.roleId === 0 ? (<button className="addres-action-button" onClick={() => { sendToSettingLocationPage(user._id) }}> Set locations for this user</button>) : (null)}
                             </div>
-                            {user.roleId === 0 ? (<button className="addres-action-button" onClick={() => { sendToSettingLocationPage(user._id) }}> Set locations for this user</button>) : (null)}
+                            <button className="admin-panel-deletebtn" onClick={() => { deleteUser(user._id) }}>Delete usr</button>
                         </div>
-                        <button className="admin-panel-deletebtn" onClick={() => { deleteUser(user._id) }}>Delete usr</button>
-                    </div>
-                )
-            })) : (null)}
+                    );
+                })}
+                </>
+            ) : (<EmptyPage text={"System has no users yet"} />)}
             {/* <form id='buttonWithText' onSubmit={submitAddress}>
                 <div id='slider' className={addAddressAnim.class}>
                     <button type="button" onClick={expand} id='toggle'>{addAddressAnim.buttonHolder}</button>

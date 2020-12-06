@@ -35,6 +35,24 @@ export default function SeeAllLocationsForAdmins() {
         setIsLoaded(true)
     }, [])
 
+    useEffect(() => {
+        const htmlAddresse = allAddresses.map(address => {
+            return (
+                <div className="address-container" key={address.id}>
+                    <p className="address-title">{address.address}</p>
+                    <div className="address-action-buttons" >
+                        <button onClick={() => { sendToReports(address.id, address.address) }} className="addres-action-button">Reports</button>
+                        <button onClick={() => { deleteLocation(address._id) }} className="admin-panel-deletebtn">Delete this location</button>
+                    </div>
+                </div>
+            )
+        })
+
+        setviewAllAddresses({
+            allAdressesValues: htmlAddresse
+        })
+    }, [allAddresses])
+
     const deleteLocation = async (id) => {
         try {
             let token = localStorage.getItem("auth-token")
@@ -47,9 +65,9 @@ export default function SeeAllLocationsForAdmins() {
 
             let newArrayWithdeletedElem = allAddresses
 
-            if (indexOfDeleteElem > -1) {
-                newArrayWithdeletedElem.splice(indexOfDeleteElem, 1)
-            }
+            // if (indexOfDeleteElem > -1) {
+            //     newArrayWithdeletedElem.splice(indexOfDeleteElem, 1)
+            // }
 
             // deleted element in array
             setviewAllAddresses({

@@ -3,6 +3,7 @@ const User = require("../models/userModel")
 const bcrypt = require("bcryptjs")
 const auth = require("../middleware/auth")
 const jwt = require("jsonwebtoken")
+const usersResponsibility = require("../models/usersresposblModel")
 
 router.post('/register', async (req, res) => {
     try {
@@ -89,6 +90,7 @@ router.post("/deleteUser", auth, async (req, res) => {
             return res.status(400).json({ msg: "Only admin can delete user" })
         }
         const deletedUser = await User.findByIdAndDelete(req.body.userID)
+        await usersResponsibility.findOneAndDelete({userId: req.body.userID})
 
         res.json(deletedUser)
     } catch (err) {

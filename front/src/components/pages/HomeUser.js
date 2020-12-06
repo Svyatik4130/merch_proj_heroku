@@ -9,6 +9,7 @@ import { addAddress } from '../../actions/locationActions'
 import AddReport from './AddReport'
 import ExactLocationsForUser from '../layout/ExactLocationsForUser'
 import IsPending from '../layout/IsPending'
+import RecentUserReports from '../pages/RecentUserReports'
 
 export default function HomeAdmin() {
     const url = window.location.href
@@ -17,8 +18,8 @@ export default function HomeAdmin() {
     const history = useHistory();
     const [isLoaded, setIsLoaded] = useState(false)
     const [classNameForMenuBtn, setclassNameForMenuBtn] = useState({
-        location: "",
-        users: ""
+        locations: "",
+        recentReports: ""
     })
     const [userInfo, setuserInfo] = useState()
 
@@ -28,11 +29,11 @@ export default function HomeAdmin() {
             let token = localStorage.getItem("auth-token")
             const { data } = await axios.get("/users/", { headers: { "x-auth-token": token } })
             console.log(data)
-            if(data.pending) history.push("/main/user/pending")
+            if (data.pending) history.push("/main/user/pending")
             setuserInfo(data)
             setIsLoaded(true)
-            
-            if(url.slice(-4) == "main"){
+
+            if (url.slice(-4) == "main") {
                 history.push("/main/user/locations")
             }
         }
@@ -48,8 +49,49 @@ export default function HomeAdmin() {
         //         users: "menu-active"
         //     })
         // }
+        if (url.match("/main/user/locations")) {
+            setclassNameForMenuBtn({
+                locations: "menu-active",
+                recentReports: ""
+            })
+        } else if (url.match("/main/user/recent-reports")) {
+            setclassNameForMenuBtn({
+                locations: "",
+                recentReports: "menu-active"
+            })
+        } else {
+            setclassNameForMenuBtn({
+                locations: "menu-active",
+                recentReports: ""
+            })
+        }
         getUser()
     }, [])
+
+    const setNewActive = (active_menu) => {
+        switch (active_menu) {
+            case "locations":
+                setclassNameForMenuBtn({
+                    locations: "menu-active",
+                    recentReports: ""
+                })
+                break;
+            case "users":
+                setclassNameForMenuBtn({
+                    locations: "",
+                    recentReports: "menu-active"
+                })
+                break;
+
+            default:
+                history.push("/main/user/locations")
+                setclassNameForMenuBtn({
+                    locations: "",
+                    recentReports: "menu-active"
+                })
+                break;
+        }
+    }
 
     if (!isLoaded) {
         return (
@@ -84,25 +126,13 @@ export default function HomeAdmin() {
                                     <p className="profile-heading">Phone ☎️ :</p>
                                     <p className="profile-value">{userInfo.phone}</p>
                                 </div>
-                                {/* { url.match("/main/admin/locations") ? (<h1>yes</h1>) : (<h2>No</h2>)} */}
                                 <div className="sidebar-menu">
-                                    {/* <Link to={"/main/admin/users"}><button onClick={() => { setNewActive("users") }} className={`sidebar-menu-button ${classNameForMenuBtn.users}`}>Users</button></Link>
-                                    {url.match("/main/admin/users") ? (<button onClick={() => {history.push("/main/admin/users/pending")}} className="admin-panel-pending-users"> Pending users </button>) : (null)}
-
-                                    <Link to={"/main/admin/locations"}><button onClick={() => { history.push("/main/admin/locations"); setNewActive("locations") }} className={`sidebar-menu-button ${classNameForMenuBtn.location}`}>Locations</button></Link>
-                                    {url.match("/main/admin/locations") ? (<>
-                                        <form id='buttonWithText' onSubmit={submitAddress}>
-                                            <div id='slider' className={addAddressAnim.class}>
-                                                <button type="button" onClick={expand} className="add-loc-button" id='toggle'>{addAddressAnim.buttonHolder}</button>
-                                                <input type='text' id='address-input' placeholder='New location name' size="8" value={addAddressAnim_inputValue.value} onChange={e => setaddAddressAnim_inputValue({ value: e.target.value })} />
-                                                <input type='submit' id='ok' value='Submit' />
-                                            </div>
-                                        </form>
-                                        <div className="all-loacations-admin">
-                                            {addAddressAnim_inputValue.status}
-                                        </div>
-                                    </>) : (null)} */}
-
+                                    {userData.user.pending ? (null) : (
+                                        <>
+                                            <Link to={"/main/user/locations"}><button onClick={() => { setNewActive("locations") }} className={`sidebar-menu-button ${classNameForMenuBtn.locations}`}>My Locations</button></Link>
+                                            <Link to={"/main/user/recent-reports"}><button onClick={() => { setNewActive("recent-reports") }} className={`sidebar-menu-button ${classNameForMenuBtn.recentReports}`}>My recent reports</button></Link>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                             <div className="content">
@@ -110,6 +140,7 @@ export default function HomeAdmin() {
                                     <Route exact path="/main/user/locations" component={ExactLocationsForUser} />
                                     <Route exact path="/main/user/makereport/:id" children={<AddReport />} />
                                     <Route exact path="/main/user/pending" children={<IsPending />} />
+                                    <Route exact path="/main/user/recent-reports" children={<RecentUserReports />} />
                                 </Switch>
                             </div>
                         </div>
