@@ -22,7 +22,7 @@ export default function PendingUsers() {
             html: pendingUsers
         })
 
-        setIsLoaded(true);
+        setIsLoaded(true)
     }, [])
 
 
