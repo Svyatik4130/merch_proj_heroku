@@ -26,11 +26,10 @@ export default function PendingUsers() {
     }, [])
 
 
-
     const acceptRegistration = async (userId) => {
         let token = localStorage.getItem("auth-token")
-        // const replaceUser = await axios.post("/users/acceptuser", { userId }, { headers: { "x-auth-token": token } })
-        // console.log(replaceUser)
+        const replaceUser = await axios.post("/users/acceptuser", { userId }, { headers: { "x-auth-token": token } })
+        console.log(replaceUser)
         const index = htmlAllPendingUsers.html.findIndex((user) => { return user._id === userId })
 
         allUsers.push(pendingUsers.find(pndUser => pndUser._id === userId))
